@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: Specializations
+## Notes: Save and load GrimFall CoA talent builds and action bars with /tb
+## Version: 1.0
+## Author: StD
+## SavedVariables: TalentBuildsDB
+
+TalentBuilds.lua
