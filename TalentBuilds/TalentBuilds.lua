@@ -114,18 +114,38 @@ local function GetDialog()
     if f and f.edit and f.import then return f end
 end
 
-local SHARE_PATH = {3, 1, 10}
+local shareBtn
+
+local function TooltipTextOf(btn)
+    local onEnter = btn:GetScript("OnEnter")
+    if not onEnter then return end
+    local ok = pcall(onEnter, btn)
+    local text = ok and GameTooltipTextLeft1 and GameTooltipTextLeft1:GetText()
+    GameTooltip:Hide()
+    local onLeave = btn:GetScript("OnLeave")
+    if onLeave then pcall(onLeave, btn) end
+    return text
+end
+
+local function ScanForShare(parent, depth)
+    if depth > 8 then return end
+    for _, c in ipairs({parent:GetChildren()}) do
+        if c:GetObjectType() == "Button" and c:GetScript("OnClick")
+           and math.abs(c:GetWidth() - 24) <= 2 then
+            local text = TooltipTextOf(c)
+            if text and text:find("Share Build") then return c end
+        end
+        local found = ScanForShare(c, depth + 1)
+        if found then return found end
+    end
+end
 
 local function FindShareButton()
-    local c = CoATalentFrame
-    if not c then return end
-    for _, idx in ipairs(SHARE_PATH) do
-        c = select(idx, c:GetChildren())
-        if not c then return end
+    if shareBtn then return shareBtn end
+    if CoATalentFrame then
+        shareBtn = ScanForShare(CoATalentFrame, 0)
     end
-    if c:GetObjectType() ~= "Button" then return end
-    if not c:GetScript("OnClick") then return end
-    return c
+    return shareBtn
 end
 
 local watcher = CreateFrame("Frame")
